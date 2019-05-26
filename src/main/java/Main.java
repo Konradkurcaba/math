@@ -1,19 +1,34 @@
-import java.util.Arrays;
+import javafx.application.Application;
+import javafx.stage.Stage;
+
 import java.util.Scanner;
 
-public class main {
+public class Main extends Application {
 
+    private static double[] xData;
+    private static double[] yData;
+
+    private static double[] interpolationX;
+    private static double[] interpolationY;
 
     public static void main(String... args)
     {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Podaj szukany węzeł: ");
-
+        System.out.println("Podaj liczbę szukanych węzłów: ");
         String buffer = scanner.nextLine();
-        double p = Double.valueOf(buffer);
+        int numberOfInputNodes = Integer.valueOf(buffer);
 
-        System.out.println("Podaj liczbę węzłów: ");
+        double inputNodes[] = new double[numberOfInputNodes];
+        for(int i =0;i<numberOfInputNodes;i++)
+        {
+            System.out.println("Podaj szukany węzeł: ");
+            buffer = scanner.nextLine();
+            double p = Double.valueOf(buffer);
+            inputNodes[i] = p;
+        }
+
+        System.out.println("Podaj liczbę znanych węzłów: ");
         buffer = scanner.nextLine();
         int numberOfNodes = Integer.valueOf(buffer);
 
@@ -60,7 +75,7 @@ public class main {
                 buffer = scanner.nextLine();
                 begin = Double.valueOf(buffer);
 
-                System.out.println("Podaj koniec przedziału");5
+                System.out.println("Podaj koniec przedziału");
                 buffer = scanner.nextLine();
                 end = Double.valueOf(buffer);
 
@@ -74,12 +89,25 @@ public class main {
             calculatedY[i] = Lagrange.valueOfY(parsed,calculatedX[i]);
         }
 
-        System.out.println("Interpolacja dla węzła: " + p + ":" );
-        System.out.println(Lagrange.interpolation(calculatedX,calculatedY,p) );
+        double[] interpolation = new double[numberOfInputNodes];
+        for(int i = 0;i<numberOfInputNodes;i++) {
 
-        System.out.println("Błąd bezwzględny: ");
-        System.out.println(Lagrange.lapse(Lagrange.interpolation(calculatedX,calculatedY,p)
-                ,Lagrange.valueOfY(parsed,p)));
+            interpolation[i] = Lagrange.interpolation(calculatedX, calculatedY,inputNodes[i]);
+            System.out.print("Interpolacja dla węzła: " + inputNodes[i] + ": ");
+            System.out.println(Lagrange.interpolation(calculatedX, calculatedY,inputNodes[i]));
+            System.out.println("Błąd bezwzględny: ");
+            System.out.println(Lagrange.lapse(Lagrange.interpolation(calculatedX,calculatedY,inputNodes[i])
+                ,Lagrange.valueOfY(parsed,inputNodes[i])));
+        }
+
+        xData = calculatedX;
+        yData = calculatedY;
+
+        interpolationX = inputNodes;
+        interpolationY = interpolation;
+
+        launch();
+
 
 
 
@@ -105,11 +133,13 @@ public class main {
 //        System.out.println("Error:");
 //        System.out.println(Lagrange.lapse(Lagrange.valueOfY(ddd,5),interpolatedY));
 //
-
-
-
-
     }
 
+    @Override
+    public void start(Stage primaryStage) throws Exception {
 
+        Chart chart = new Chart(xData,yData,interpolationX,interpolationY);
+        chart.start(primaryStage);
+
+    }
 }

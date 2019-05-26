@@ -37,7 +37,8 @@ public class Lagrange {
     public static double[] nodesChb(int numberOfNodes, double begin, double end) {
         double[] resultsX = new double[numberOfNodes];
         for (int i = 1; i <= numberOfNodes; i++) {
-            resultsX[i-1] = Math.cos(((2.0 * i - 1) / (2.0 * numberOfNodes)) * Math.PI);
+            resultsX[i-1] = 0.5 * (begin + end) + 0.5 * (end - begin) *
+                    Math.cos(((2.0 * i - 1) / (2.0 * numberOfNodes)) * Math.PI);
         }
         return  resultsX;
 
