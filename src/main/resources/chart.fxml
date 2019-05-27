@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="577.0" prefWidth="856.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ChartController">
+   <children>
+      <LineChart fx:id="chart" layoutX="-6.0" layoutY="-3.0" prefHeight="463.0" prefWidth="864.0">
+        <xAxis>
+          <NumberAxis label="X" side="BOTTOM" fx:id="xAxis" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="yAxis" label="Y" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <TextField layoutX="212.0" layoutY="513.0" prefHeight="25.0" prefWidth="77.0" fx:id="xMin" />
+      <TextField fx:id="yMin" layoutX="504.0" layoutY="513.0" prefHeight="25.0" prefWidth="77.0" />
+      <Label layoutX="171.0" layoutY="517.0" text="Oś X" />
+      <TextField layoutX="317.0" layoutY="513.0" prefHeight="25.0" prefWidth="77.0" fx:id="xMax" />
+      <TextField fx:id="yMax" layoutX="609.0" layoutY="513.0" prefHeight="25.0" prefWidth="77.0" />
+      <Label layoutX="448.0" layoutY="517.0" text="Oś Y" />
+      <Label layoutX="301.0" layoutY="517.0" text="-" />
+      <Label layoutX="594.0" layoutY="517.0" text="-" />
+      <Button fx:id="okButton" layoutX="413.0" layoutY="538.0" mnemonicParsing="false" text="OK" />
+      <Button fx:id="ChbN" layoutX="188.0" layoutY="460.0" mnemonicParsing="false" text="ChbN" />
+      <Button fx:id="ChbI" layoutX="251.0" layoutY="460.0" mnemonicParsing="false" text="ChbI" />
+      <Button fx:id="EqlN" layoutX="405.0" layoutY="460.0" mnemonicParsing="false" text="EqlN" />
+      <Button fx:id="EqlI" layoutX="454.0" layoutY="460.0" mnemonicParsing="false" text="EqlI" />
+      <Button fx:id="usrN" layoutX="599.0" layoutY="460.0" mnemonicParsing="false" text="UsrN" />
+      <Button fx:id="usrI" layoutX="648.0" layoutY="460.0" mnemonicParsing="false" text="UsrI" />
+   </children>
+</Pane>

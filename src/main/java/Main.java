@@ -1,15 +1,14 @@
 import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.util.Scanner;
 
 public class Main extends Application {
 
-    private static double[] xData;
-    private static double[] yData;
-
-    private static double[] interpolationX;
-    private static double[] interpolationY;
+    private static ChartData chartData = new ChartData();
 
     public static void main(String... args)
     {
@@ -41,105 +40,140 @@ public class Main extends Application {
             parsed[ii] = Double.valueOf(splited[ii]);
         }
 
-
-        System.out.println("Rozkład węzłów: 1 - równoodległe, 2 - różne odległości, 3 - Czebyszewa");
+        System.out.println("Czy chcesz podać własne węzły ? [y/n]");
         buffer = scanner.nextLine();
-        int mode = Integer.valueOf(buffer);
-        double[] calculatedX = new double[numberOfNodes];
-        switch (mode)
+        double[] userX = null;
+        boolean userNodes = false;
+        if(buffer.equals("y"))
         {
-            case 1:
-                System.out.println("Podaj początek przedziału");
+            userNodes = true;
+            System.out.println("Wymien wezly:");
+            userX = new double[numberOfNodes];
+            for (int i =0;i<numberOfNodes;i++)
+            {
                 buffer = scanner.nextLine();
-                Double begin = Double.valueOf(buffer);
+                userX[i] = Double.valueOf(buffer);
+            }
+        }
+        double[] chbNodes = new double[numberOfNodes];
+        double[] eqlNodes = new double[numberOfNodes];
+        System.out.println("Podaj początek przedziału");
+        buffer = scanner.nextLine();
+        Double begin = Double.valueOf(buffer);
 
-                System.out.println("Podaj koniec przedziału");
-                buffer = scanner.nextLine();
-                Double end = Double.valueOf(buffer);
+        System.out.println("Podaj koniec przedziału");
+        buffer = scanner.nextLine();
+        Double end = Double.valueOf(buffer);
 
-                calculatedX = Lagrange.node(numberOfNodes,begin,end);
-                break;
+        chbNodes = Lagrange.nodesChb(numberOfNodes,begin,end);
+        eqlNodes = Lagrange.node(numberOfNodes,begin,end);
 
-            case 2:
-                System.out.println("Wymien wezly:");
+        double[] chbY = calculateY(chbNodes,parsed);
+        double[] eqlY = calculateY(eqlNodes,parsed);
+        double[] userY = null;
 
-                for (int i =0;i<numberOfNodes;i++)
-                {
-                    buffer = scanner.nextLine();
-                    calculatedX[i] = Double.valueOf(buffer);
-                }
-                break;
-
-            case 3:
-                System.out.println("Podaj początek przedziału");
-                buffer = scanner.nextLine();
-                begin = Double.valueOf(buffer);
-
-                System.out.println("Podaj koniec przedziału");
-                buffer = scanner.nextLine();
-                end = Double.valueOf(buffer);
-
-                calculatedX = Lagrange.nodesChb(numberOfNodes,begin,end);
-                break;
+        if(userNodes)
+        {
+            userY = calculateY(userX,parsed);
         }
 
-        double[] calculatedY = new double[calculatedX.length];
-        for(int i = 0;i<calculatedX.length;i++)
-        {
-            calculatedY[i] = Lagrange.valueOfY(parsed,calculatedX[i]);
-        }
+        double[] interpolationChb = new double[numberOfInputNodes];
+        double[] interpolationEql = new double[numberOfInputNodes];
 
-        double[] interpolation = new double[numberOfInputNodes];
+        System.out.println("Interpolacja na podstawie węzłów Czebyszewa");
+
         for(int i = 0;i<numberOfInputNodes;i++) {
 
-            interpolation[i] = Lagrange.interpolation(calculatedX, calculatedY,inputNodes[i]);
+            interpolationChb[i] = Lagrange.interpolation(chbNodes, chbY,inputNodes[i]);
             System.out.print("Interpolacja dla węzła: " + inputNodes[i] + ": ");
-            System.out.println(Lagrange.interpolation(calculatedX, calculatedY,inputNodes[i]));
+            System.out.println(Lagrange.interpolation(chbNodes, chbY ,inputNodes[i]));
             System.out.println("Błąd bezwzględny: ");
-            System.out.println(Lagrange.lapse(Lagrange.interpolation(calculatedX,calculatedY,inputNodes[i])
+            System.out.println(Lagrange.lapse(Lagrange.interpolation(chbNodes,chbY,inputNodes[i])
                 ,Lagrange.valueOfY(parsed,inputNodes[i])));
         }
 
-        xData = calculatedX;
-        yData = calculatedY;
+        System.out.println("Interpolacja na podstawie węzłów równoodległych");
+        for(int i = 0;i<numberOfInputNodes;i++) {
 
-        interpolationX = inputNodes;
-        interpolationY = interpolation;
+            interpolationEql[i] = Lagrange.interpolation(eqlNodes, eqlY,inputNodes[i]);
+            System.out.print("Interpolacja dla węzła: " + inputNodes[i] + ": ");
+            System.out.println(Lagrange.interpolation(eqlNodes, eqlY ,inputNodes[i]));
+            System.out.println("Błąd bezwzględny: ");
+            System.out.println(Lagrange.lapse(Lagrange.interpolation(eqlNodes,eqlY,inputNodes[i])
+                    ,Lagrange.valueOfY(parsed,inputNodes[i])));
+        }
 
+        chartData.setChbX(chbNodes);
+        chartData.setChbY(chbY);
+        chartData.setEqlX(eqlNodes);
+        chartData.setEqlY(eqlY);
+        chartData.setUserX(userX);
+        chartData.setUserY(userY);
+        chartData.setInputNodes(inputNodes);
+        chartData.setInterYEql(interpolationEql);
+        chartData.setInterYChb(interpolationChb);
+
+        System.out.println("Największy błąd w przedziale - równoodległe " + inputNodes[0] + " - "
+                + inputNodes[inputNodes.length-1] + " :" );
+
+        double node = inputNodes[0];
+        double maxLapse = 0;
+        while(node < inputNodes[inputNodes.length-1])
+        {
+            if(maxLapse <
+            Lagrange.lapse(Lagrange.interpolation(eqlNodes,eqlY,node)
+                    ,Lagrange.valueOfY(parsed,node)))
+            {
+                maxLapse =  Lagrange.lapse(Lagrange.interpolation(eqlNodes,eqlY,node)
+                        ,Lagrange.valueOfY(parsed,node));
+            }
+            node +=0.1;
+        }
+        System.out.println(maxLapse);
+
+        System.out.println("Największy błąd w przedziale - Czebyszewa " + inputNodes[0] + " - "
+                + inputNodes[inputNodes.length-1] + " :" );
+
+        node = inputNodes[0];
+        maxLapse = 0;
+        while(node < inputNodes[inputNodes.length-1])
+        {
+            if(maxLapse <
+                    Lagrange.lapse(Lagrange.interpolation(chbNodes,chbY,node)
+                            ,Lagrange.valueOfY(parsed,node)))
+            {
+                maxLapse =  Lagrange.lapse(Lagrange.interpolation(chbNodes,chbY,node)
+                        ,Lagrange.valueOfY(parsed,node));
+            }
+            node +=0.1;
+        }
+        System.out.println(maxLapse);
         launch();
 
-
-
-
-
-//
-//        double[] x = {2.0,3.0,4.0};
-//        double[] y = {-1.119,-0.9792,-0.7662};
-//        double expectedX = 5;
-//
-//        double interpolatedY = Lagrange.interpolation(x,y,expectedX);
-//
-//        System.out.println(interpolatedY);
-//
-//        double results[] = Lagrange.nodesChb(4,-1,1);
-//
-//        System.out.println(Arrays.toString(results));
-//
-//
-//        double[] ddd = {5.0,1.0,2.0,3.0};
-//        double[] eeee = {3.13,2.0,1.0,5.0};
-//        System.out.println(Lagrange.valueOfY(ddd,6));
-//
-//        System.out.println("Error:");
-//        System.out.println(Lagrange.lapse(Lagrange.valueOfY(ddd,5),interpolatedY));
-//
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        Chart chart = new Chart(xData,yData,interpolationX,interpolationY);
-        chart.start(primaryStage);
+        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("chart.fxml"));
+        Parent root = loader.load();
+        ChartController controller = loader.getController();
+        controller.putData(chartData);
+        primaryStage.setTitle("Interpolacja");
+        primaryStage.setScene(new Scene(root));
+        primaryStage.show();
 
     }
+
+    private static double[] calculateY(double[] x,double[] polynomial)
+    {
+        double[] calculatedY = new double[x.length];
+        for(int i = 0;i<x.length;i++)
+        {
+            calculatedY[i] = Lagrange.valueOfY(polynomial,x[i]);
+        }
+        return calculatedY;
+    }
+
+
 }
