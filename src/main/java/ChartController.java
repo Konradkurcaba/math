@@ -43,9 +43,9 @@ public class ChartController {
     @FXML
     private Button EqlI;
     @FXML
-    private Button UsrN;
+    private Button usrN;
     @FXML
-    private Button UsrI;
+    private Button usrI;
 
 
     private ChartData data;
@@ -78,15 +78,15 @@ public class ChartController {
             initChart();
         });
 
-//        UsrI.setOnAction( e-> {
-//            showUsrI = !showUsrI;
-//            initChart();
-//        });
-//
-//        UsrN.setOnAction( e -> {
-//            showUsrN = !showUsrN;
-//            initChart();
-//        });
+        usrI.setOnAction( e-> {
+            showUsrI = !showUsrI;
+            initChart();
+        });
+
+        usrN.setOnAction( e -> {
+            showUsrN = !showUsrN;
+            initChart();
+        });
 
 
 
@@ -133,11 +133,17 @@ public class ChartController {
             chart.getData().add(getSeries(data.getInputNodes(),data.getInterYChb()
                     ,"interpolowane równoodlegle"));
         }
+        if(data.getInterYUsr() != null && showUsrI )
+        {
+            chart.getData().add(getSeries(data.getInputNodes(),data.getInterYUsr()
+                    ,"interpolowane użytkownika"));
+        }
         if(data.getUserX() != null && showUsrN )
         {
-            chart.getData().add(getSeries(data.getInputNodes(),data.getInterYChb()
+            chart.getData().add(getSeries(data.getUserX(),data.getUserY()
                     ,"Użytkownika"));
         }
+
      //   if(data. != null && showUsrI)
 
 //        for (XYChart.Data<Number, Number> data : series.getData()) {

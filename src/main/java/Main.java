@@ -79,6 +79,7 @@ public class Main extends Application {
 
         double[] interpolationChb = new double[numberOfInputNodes];
         double[] interpolationEql = new double[numberOfInputNodes];
+        double[] interpolationUsr = null;
 
         System.out.println("Interpolacja na podstawie węzłów Czebyszewa");
 
@@ -103,6 +104,23 @@ public class Main extends Application {
                     ,Lagrange.valueOfY(parsed,inputNodes[i])));
         }
 
+        if(userNodes)
+        {
+            interpolationUsr = new double[numberOfNodes];
+            System.out.println("Interpolacja na podstawie węzłów użytkownika");
+            for(int i = 0;i<numberOfInputNodes;i++) {
+
+                interpolationUsr[i] = Lagrange.interpolation(userX, userY,inputNodes[i]);
+                System.out.print("Interpolacja dla węzła: " + inputNodes[i] + ": ");
+                System.out.println(Lagrange.interpolation(userX, userY ,inputNodes[i]));
+                System.out.println("Błąd bezwzględny: ");
+                System.out.println(Lagrange.lapse(Lagrange.interpolation(userX,userY,inputNodes[i])
+                        ,Lagrange.valueOfY(parsed,inputNodes[i])));
+            }
+
+
+        }
+
         chartData.setChbX(chbNodes);
         chartData.setChbY(chbY);
         chartData.setEqlX(eqlNodes);
@@ -112,6 +130,7 @@ public class Main extends Application {
         chartData.setInputNodes(inputNodes);
         chartData.setInterYEql(interpolationEql);
         chartData.setInterYChb(interpolationChb);
+        chartData.setInterYUsr(interpolationUsr);
 
         System.out.println("Największy błąd w przedziale - równoodległe " + inputNodes[0] + " - "
                 + inputNodes[inputNodes.length-1] + " :" );
